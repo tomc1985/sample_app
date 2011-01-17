@@ -15,6 +15,8 @@ class User < ActiveRecord::Base
   attr_accessible :name, :email, :password, :password_confirmation
   attr_accessor   :password
   
+  has_many :microposts, :dependent => :destroy
+  
   before_save :encrypt_password
   
   email_regex = /^[^@]+@.+?\.\w{2,}/i
@@ -41,6 +43,11 @@ class User < ActiveRecord::Base
   def self.authenticate_with_salt(id, cookie_salt)
     user = find_by_id(id)
     (user && user.salt == cookie_salt) ? user : nil
+  end
+  
+  def feed
+    # preliminary
+    Micropost.where("user_id = ?", id)
   end
   
   private
